@@ -1,0 +1,60 @@
+{
+  "data_folder": {
+    "sup": false,
+    "sup_path": "./dataset/cifar10",
+    "num_sup_tr": 10000,
+    "num_sup_val": 10000,
+    "num_sup_test": 10000,
+    "unsup": false,
+    "unsup_path": "./dataset/LSUN/test",
+    "num_unsup_tr": 10000,
+    "num_unsup_val": 10000,
+    "num_unsup_test": 10000
+  }
+}{
+  "train": {
+    "api": false,
+    "crop": false,
+    "num_class": 10,
+    "ID_api": "",
+    "pre_train": true,
+    "model_savedir": "",
+    "model": "densenet",
+    "out_features": 10,
+    "sup_train": false,
+    "sup_path": "./model/ckp_weights/new-pre-train/dense10.pt",
+    "sup_epoch": 10,
+    "sup_lr": 0.01,
+    "sup_momentum": 0.9,
+    "sup_wdecay": 0.0005,
+    "unsup_train": false,
+    "unsup_path": "./model/ckp_weights/fine-tune/weights/TINr_d_10.pt",
+    "unsup_epoch": 10,
+    "unsup_lr": 0.01,
+    "unsup_momentum": 0.9,
+    "unsup_wdecay": 0.0005,
+    "batch": 64
+  }
+}{
+  "test": {
+    "api": false,
+    "crop": false,
+    "num_class": 10,
+    "ID_api": "",
+    "test": "",
+    "model": "densenet",
+    "out_features": 10,
+    "sup_test": false,
+    "sup_path": "./model/ckp_weights/new-pre-train/dense10.pt",
+    "unsup_test": false,
+    "unsup_path": "./model/ckp_weights/fine-tune/weights/TINr_d_10.pt",
+    "save_pic": "./result/ROC.png"
+  }
+}{
+  "dataset": {
+    "api": false,
+    "crop": false,
+    "num_class": 10,
+    "ID_api": ""
+  }
+}

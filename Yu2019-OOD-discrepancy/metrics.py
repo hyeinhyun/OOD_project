@@ -9,7 +9,7 @@ import numpy as np
 def evaluate(labels, scores, metric='roc',save_to=''):
 
     if metric == 'roc':
-        rocs=roc(labels, scores)
+        rocs=roc(labels, scores,save_to)
         return rocs
 
     elif metric == 'best f1':
@@ -19,7 +19,8 @@ def evaluate(labels, scores, metric='roc',save_to=''):
         Y1 = scores[labels == 1]#OOD
 
         fpr95, detect_error, auprin, auprout, auroc=calMetric(X1,Y1,save_to)
-
+        rocs=roc(labels,scores,save_to)
+        print(rocs)
         return auroc,fpr95, detect_error, auprin, auprout
     else:
         raise NotImplementedError("Check the evaluation metric.")
@@ -65,7 +66,7 @@ def best_f1(labels, scores):
     return best, acc, sens, spec, best_threshold
 
 #
-def roc(labels, scores):
+def roc(labels, scores,saveto):
     """ 
     Evaluate ROC
 
@@ -82,7 +83,22 @@ def roc(labels, scores):
     # True/False Positive Rates.
     fpr, tpr, _ = roc_curve(labels, scores)
     roc_auc = auc(fpr, tpr)
+    eer = brentq(lambda x: 1. - x - interp1d(fpr, tpr)(x), 0., 1.)
 
+    if saveto:
+        plt.figure()
+        lw = 2
+        plt.plot(fpr, tpr, color='darkorange', lw=lw, label='(AUC = %0.2f, EER = %0.2f)' % (roc_auc, eer))
+        plt.plot([eer], [1-eer], marker='o', markersize=5, color="navy")
+        plt.plot([0, 1], [1, 0], color='navy', lw=1, linestyle=':')
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.05])
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('Receiver operating characteristic')
+        plt.legend(loc="lower right")
+        plt.savefig(saveto)
+        plt.close()
     return roc_auc
 
 def calMetric(X1, Y1,save_to=''):
@@ -119,11 +135,11 @@ def calMetric(X1, Y1,save_to=''):
         auroc += (fpr-fprTemp)*tpr
         fprTemp = fpr
     auroc += (1-fpr) * tpr
-    
+    """
     if save_to:
         plt.figure()
         lw = 2
-        plt.plot(fpr, tpr, color='darkorange', lw=lw, label='(AUC = %0.2f, EER = %0.2f)' % (roc_auc, eer))
+        plt.plot(fpr, tpr, color='darkorange', lw=lw, label='(AUC = %0.2f)' % (auroc))
         plt.plot([eer], [1-eer], marker='o', markersize=5, color="navy")
         plt.plot([0, 1], [1, 0], color='navy', lw=1, linestyle=':')
         plt.xlim([0.0, 1.0])
@@ -134,6 +150,7 @@ def calMetric(X1, Y1,save_to=''):
         plt.legend(loc="lower right")
         plt.savefig(save_to)
         plt.close()
+    """
     ##################################################################
     # FPR at TPR 95
     ##################################################################
@@ -145,15 +162,13 @@ def calMetric(X1, Y1,save_to=''):
     for delta in total_li:
         tpr = np.sum(np.less_equal(X1, delta)) / np.float(len(X1))
         error2 = np.sum(np.less_equal(Y1, delta)) / np.float(len(Y1))
-        if tpr <= 0.9505 and tpr >= 0.9495:
+        if tpr <= 0.9549 and tpr >= 0.9450:
             fpr += error2
             total += 1
         #print("tpr: %.3f" % tpr)
 
     fpr95 = fpr/total
-
     #print("fpr95: %.3f" % fpr95)
-
     ##################################################################
     # Detection error
     ##################################################################
@@ -162,6 +177,8 @@ def calMetric(X1, Y1,save_to=''):
         fnr = np.sum(np.greater_equal(X1, delta)) / np.float(len(X1))
         fpr = np.sum(np.less_equal(Y1, delta)) / np.float(len(Y1))
         detect_error = np.minimum(detect_error, (fnr + fpr) / 2.0)
+        if detect_error==(fnr + fpr) / 2.0:
+            print("delta :{} {}".format( delta,detect_error))
 
     #print("Detection error: %.3f " % detect_error)
 

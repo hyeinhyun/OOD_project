@@ -30,7 +30,7 @@ import torchvision.transforms as T
 from torchvision.datasets import CIFAR10, MNIST
 
 #Custom
-from config import *
+#from config import *
 
 def dataset_loader(sup_train='',sup_val='',sup_test='',unsup_train='',unsup_val='',unsup_test='',BATCH=64):
     indices = list(range(10000))
@@ -40,7 +40,7 @@ def dataset_loader(sup_train='',sup_val='',sup_test='',unsup_train='',unsup_val=
         train_loader = DataLoader(sup_train, batch_size=BATCH//2,
                                   shuffle=True, pin_memory=True, 
                                   drop_last=True, num_workers=2)
-        dataloaders['sup_train']=train_loader
+        dataloaders['sup_train']=(train_loader)
     if sup_val:
         val_loader = DataLoader(sup_val, batch_size=BATCH,
                                 shuffle=True,
@@ -60,7 +60,7 @@ def dataset_loader(sup_train='',sup_val='',sup_test='',unsup_train='',unsup_val=
         unsup_val_loader = DataLoader(unsup_val, batch_size=BATCH,
                                       shuffle=False, pin_memory=True, 
                                       num_workers=2)
-        dataloaders['unsup_val']=unsup_val_loader
+        dataloaders['unsup_val']=(unsup_val_loader)
     if unsup_test:
         unsup_test_loader = DataLoader(unsup_test, batch_size=BATCH,
                                       shuffle=False, pin_memory=True, 
